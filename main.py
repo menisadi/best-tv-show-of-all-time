@@ -1,5 +1,6 @@
 import pandas as pd
 from pathlib import Path
+from rich.console import Console
 
 
 def process_file(filepath):
@@ -13,7 +14,8 @@ def process_file(filepath):
     return pd.DataFrame(data, columns=["Rank", "Title"])
 
 
-if __name__ == "__main__":
+def main():
+    cons = Console()
     ranks_folder = "./sourcses/"
     text_files = [ranks_folder + f.name for f in list(Path(ranks_folder).glob("*.txt"))]
     all_data = []
@@ -41,5 +43,15 @@ if __name__ == "__main__":
         by="WeightedScore", ascending=False
     )
 
-    print(consensus_df.head())
-    print(weighted_score_df.head())
+    combined_df["Title"] = combined_df["Title"].str.title()
+    weighted_score_df["Title"] = weighted_score_df["Title"].str.title()
+
+    top_k = 10
+    cons.print("Most Consensus", style="red bold")
+    cons.print(consensus_df.head(top_k).reset_index(drop=True))
+    cons.print("Weighted Score", style="red bold")
+    cons.print(weighted_score_df.head(top_k).reset_index(drop=True))
+
+
+if __name__ == "__main__":
+    main()
