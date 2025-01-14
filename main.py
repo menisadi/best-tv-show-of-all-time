@@ -1,4 +1,5 @@
 import pandas as pd
+import argparse
 from pathlib import Path
 from rich.console import Console
 
@@ -14,7 +15,7 @@ def process_file(filepath):
     return pd.DataFrame(data, columns=["Rank", "Title"])
 
 
-def main():
+def main(top_k):
     cons = Console()
     ranks_folder = "./sourcses/"
     text_files = [ranks_folder + f.name for f in list(Path(ranks_folder).glob("*.txt"))]
@@ -46,7 +47,6 @@ def main():
     combined_df["Title"] = combined_df["Title"].str.title()
     weighted_score_df["Title"] = weighted_score_df["Title"].str.title()
 
-    top_k = 10
     cons.print("Most Consensus", style="red bold")
     cons.print(consensus_df.head(top_k).reset_index(drop=True))
     cons.print("Weighted Score", style="red bold")
@@ -54,4 +54,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Process and rank shows.")
+    parser.add_argument(
+        "-k",
+        "--top_k",
+        type=int,
+        default=10,
+        help="Number of top results to display (default: 10)",
+    )
+    args = parser.parse_args()
+
+    main(top_k=args.top_k)
